@@ -1,45 +1,48 @@
 import os
 
 import cv2
+import matplotlib.pyplot as plt
 import wx
 
 
-# RGB分解
-def color_separate(img):
-    r_img = img[:, :, 2]
-    g_img = img[:, :, 1]
-    b_img = img[:, :, 0]
+# 画像出力
+def output_img(img, title, file_name):
+    fig = plt.figure()
 
-    return r_img, g_img, b_img
+    if len(img.shape) >= 3:
+        # カラー用
+        plt.imshow(img)
+        plt.title(title)
+        fig.savefig(os.path.join("output", file_name))
+    else:
+        # グレースケール用
+        plt.imshow(img, vmin=0, vmax=255)
+        plt.title(title)
+        plt.gray()
+        plt.colorbar()
+        fig.savefig(os.path.join("output", file_name))
+
 
 # 画像処理メイン
 def img_process_main(file_path):
     # 画像の読み込み
     img = cv2.imread(file_path)
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     # RGB→グレースケール
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
 
-    # RGB分解
-    r_img, g_img, b_img = color_separate(img)
+    # 画像描画
+    output_img(img_rgb, "RGB", "00_rgb_img.jpg")
+    output_img(img_gray, "GRAY", "01_gray_img.jpg")
 
-    while True:
-        # 画像の描画
-        cv2.imshow("RGB", img)
-        cv2.imshow("GRAY", img_gray)
-        cv2.imshow("R", r_img)
-        cv2.imshow("G", g_img)
-        cv2.imshow("B", b_img)
-
-        key = cv2.waitKey(30)
-        # enterキーで
-        # 閉じるようにしてみる
-        if key == 13:
-            break
+    for i, c in zip(range(3), 'RGB'):
+        # 画像描画
+        output_img(img_rgb[:, :, i], f"{c}_channnel", f"02_{c}_channnel.jpg")
 
 
 # メイン関数
-def main():
+if __name__ == "__main__":
     # ファイルダイアログ作成
     app = wx.App()
     dialog = wx.FileDialog(None, u'画像を選択してください。')
@@ -48,10 +51,9 @@ def main():
     file_path = dialog.GetPath()
     __, ext = os.path.splitext(file_path)
 
+    # 出力フォルダ作成
+    if not os.path.exists("output"):
+        os.mkdir("output")
+
     if ext == ".jpg":
         img_process_main(file_path)
-
-
-if __name__ == "__main__":
-    # メイン関数呼び出し
-    main()

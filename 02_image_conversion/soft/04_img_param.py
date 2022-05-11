@@ -2,6 +2,7 @@ import os
 
 import cv2
 import matplotlib.pyplot as plt
+import numpy as np
 import wx
 
 
@@ -23,6 +24,24 @@ def output_img(img, title, file_name):
         fig.savefig(os.path.join("output", file_name))
 
 
+# パラメータ計算
+def calc_param_main(img):
+    print(f"mean:{img.mean()}")
+    print(f"std:{img.std()}")
+    print(f"median:{np.median(img)}")
+    print(f"max:{img.max()}")
+    print(f"min:{img.min()}")
+    m_contrast = (img.max() - img.min()) / (img.max() + img.min())
+    print(f"M contrast:{m_contrast}")
+    if img.min() > 0:
+        contrast_ratio = img.max() / img.min()
+    else:
+        contrast_ratio = -1
+    print(f"contrast ratio:{contrast_ratio}")
+    contrast_diff = img.max() - img.min()
+    print(f"contrast diff:{contrast_diff}")
+
+
 # 画像処理メイン
 def img_process_main(file_path):
     # 画像の読み込み
@@ -35,6 +54,9 @@ def img_process_main(file_path):
     # 画像描画
     output_img(img_rgb, "RGB", "00_rgb_img.jpg")
     output_img(img_gray, "GRAY", "01_gray_img.jpg")
+
+    # パラメータ計算
+    calc_param_main(img)
 
 
 # メイン関数

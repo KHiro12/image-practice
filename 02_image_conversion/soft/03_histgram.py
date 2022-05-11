@@ -23,6 +23,23 @@ def output_img(img, title, file_name):
         fig.savefig(os.path.join("output", file_name))
 
 
+# ヒストグラムメイン処理
+def histgram_main(img):
+    fig = plt.figure()
+
+    color = ('b', 'g', 'r')
+    plt.title("Histgram")
+    for i, col in enumerate(color):
+        histr = cv2.calcHist([img], [i], None, [256], [0, 256])
+        plt.plot(histr, color=col)
+        plt.xlim([0, 256])
+
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    histr = cv2.calcHist([img_gray], [0], None, [256], [0, 256])
+    plt.plot(histr, color='orange')
+    fig.savefig(os.path.join("output", "03_Histgram.jpg"))
+
+
 # 画像処理メイン
 def img_process_main(file_path):
     # 画像の読み込み
@@ -35,6 +52,9 @@ def img_process_main(file_path):
     # 画像描画
     output_img(img_rgb, "RGB", "00_rgb_img.jpg")
     output_img(img_gray, "GRAY", "01_gray_img.jpg")
+
+    # ヒストグラム
+    histgram_main(img)
 
 
 # メイン関数
